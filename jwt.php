@@ -6,6 +6,12 @@ namespace kuralab;
  */
 class JWT
 {
+  private static $supportedAlgorithm = array(
+    'HS256' => 'sha256',
+    'HS382' => 'sha384',
+    'HS512' => 'sha512',
+  );
+
   private $header;
   private $payload;
   private $signature;
@@ -31,8 +37,31 @@ class JWT
     }
   }
 
-  public function encode()
+  public function encode( $algorithm, $issuer, $audience, $expiration, $nonce, $secret )
   {
+    if ( !array_key_exists( $algorithm, self::$supportedAlgorithm ) ) {
+      throw new Exception( 'unsupported algorithm' );
+    }
+    $headerArray = array(
+      'alg' => $algorithm,
+      'typ' => 'JWT'
+    );
+    $payloadArray = array(
+      'iss'   => $issuer,
+      'aud'   => $audience,
+      'exp'   => $expiration,
+      'iat'   => time(),
+      'nonce' => $nonce
+    );
+    $header  = base64_encode( json_encode( $headerArray ) );
+    $payload = base64_encode( json_encode( $payloadArray ) );
+    $signature = $this->generateSignature(
+      $header,
+      $payload,
+      $algorithm,
+      $secret
+    );
+    return implode( '.', array( $header, $payload, $signature ) );
   }
 
   public function decode()
@@ -122,18 +151,12 @@ class JWT
 
   private function generateSignature( $header, $payload, $algorithm, $secret )
   {
-    $supportedAlgorithm = array(
-      'HS256' => 'sha256',
-      'HS382' => 'sha384',
-      'HS512' => 'sha512',
-    );
-
-    if ( !array_key_exists( $algorithm, $supportedAlgorithm ) ) {
+    if ( !array_key_exists( $algorithm, self::$supportedAlgorithm ) ) {
       throw new Exception( 'unsupported algorithm' );
     }
 
     $hash = hash_hmac(
-      $supportedAlgorithm[$algorithm],
+      self::$supportedAlgorithm[$algorithm],
       $header . '.' . $payload,
       $secret,
       true
