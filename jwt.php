@@ -40,7 +40,7 @@ class JWT
   public function encode( $algorithm, $issuer, $audience, $expiration, $nonce, $secret )
   {
     if ( !array_key_exists( $algorithm, self::$supportedAlgorithm ) ) {
-      throw new Exception( 'unsupported algorithm' );
+      throw new \Exception( 'unsupported algorithm' );
     }
     $headerArray = array(
       'alg' => $algorithm,
