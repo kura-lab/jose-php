@@ -3,9 +3,9 @@ require_once('../src/jwt.php');
 
 use \kuralab\JWT;
 
-class StackTest extends PHPUnit_Framework_TestCase
+class JWTTest extends PHPUnit_Framework_TestCase
 {
-  public function testExcute()
+  public function testExecute()
   {
     $client_id  = 'client123';
     $secret     = 'xxxyyyzzz';
