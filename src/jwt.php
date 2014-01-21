@@ -71,9 +71,9 @@ class JWT
       return null;
     }
     $result = array(
-      $this->headerArray,
-      $this->payloadArray,
-      $this->signature,
+      'header'    => $this->headerArray,
+      'payload'   => $this->payloadArray,
+      'signature' => $this->signature,
     );
     return $result;
   }
