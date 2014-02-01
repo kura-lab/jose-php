@@ -10,6 +10,9 @@ class JsonWebToken
     'HS256' => 'sha256',
     'HS382' => 'sha384',
     'HS512' => 'sha512',
+    'RS256' => 'sha256',
+    'RS382' => 'sha384',
+    'RS512' => 'sha512',
   );
 
   private $header;
@@ -140,33 +143,73 @@ class JsonWebToken
     /**
      * check signature
      */
-    $sig = $this->generateSignature(
-      $this->header,
-      $this->payload,
-      $this->headerArray['alg'],
-      $secret
-    );
-    if ( $this->signature != $sig ) {
-      throw new \Exception( 'signature error' );
+    if ( preg_match( '/^HS/', $this->headerArray['alg'] ) ) {
+      $sig = $this->generateSignature(
+        $this->header,
+        $this->payload,
+        $this->headerArray['alg'],
+        $secret
+      );
+      if ( $this->signature != $sig ) {
+        throw new \Exception( 'signature error' );
+      }
+    } else if ( preg_match( '/^RS/', $this->headerArray['alg'] ) ) {
+      $signature = str_replace(
+        array( '-', '_' ),
+        array( '+', '/' ),
+        $this->signature
+      );
+      $publicKey = openssl_pkey_get_public( $secret );
+      $result = openssl_verify(
+        $this->header . '.' . $this->payload,
+        base64_decode( $signature ),
+        $publicKey,
+        self::$supportedAlgorithm[$this->headerArray['alg']]
+      );
+
+      if ( $result != 1 ) {
+        throw new \Exception( 'signature error' );
+      }
+    } else {
+      throw new \Exception( 'unsupported algorithm' );
     }
   }
 
   private function generateSignature( $header, $payload, $algorithm, $secret )
   {
     if ( !array_key_exists( $algorithm, self::$supportedAlgorithm ) ) {
-      throw new Exception( 'unsupported algorithm' );
+      throw new \Exception( 'unsupported algorithm' );
     }
 
-    $hash = hash_hmac(
-      self::$supportedAlgorithm[$algorithm],
-      $header . '.' . $payload,
-      $secret,
-      true
-    );
+    if ( preg_match( '/^HS/', $algorithm ) ) {
+      $signature = hash_hmac(
+        self::$supportedAlgorithm[$algorithm],
+        $header . '.' . $payload,
+        $secret,
+        true
+      );
+    } else if ( preg_match( '/^RS/', $algorithm ) ) {
+      $signature = $this->encryptRsa(
+        self::$supportedAlgorithm[$algorithm],
+        $header . '.' . $payload,
+        $secret
+      );
+    } else {
+      throw new \Exception( 'unsupported algorithm' );
+    }
 
-    $encodedHash = base64_encode( $hash );
+    $encodedHash = base64_encode( $signature );
     $signature = str_replace( array( '=' ), array( '' ), 
     str_replace( array( '+', '/' ), array( '-', '_' ), $encodedHash ) );
+    
+    return $signature;
+  }
+
+  private function encryptRsa( $algorithm, $data, $secret )
+  {
+    $privateKeyId = openssl_pkey_get_private( $secret );
+    openssl_sign( $data, $signature, $privateKeyId, $algorithm );
+    openssl_free_key( $privateKeyId );
 
     return $signature;
   }
