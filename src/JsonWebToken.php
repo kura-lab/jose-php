@@ -1,10 +1,10 @@
 <?php
-namespace kuralab;
+namespace kuralab\jose;
 
 /**
  * Json Web Token Class
  */
-class JWT
+class JsonWebToken
 {
   private static $supportedAlgorithm = array(
     'HS256' => 'sha256',
@@ -29,9 +29,11 @@ class JWT
         $this->signature = $explodedIdToken[2];
         $this->headerArray  = json_decode( base64_decode( $this->header ), true );
         if ( $this->headerArray == null ) {
+          throw new \UnexpectedValueException( 'unexpected header' );
         }
         $this->payloadArray = json_decode( base64_decode( $this->payload ), true );
         if( $this->payloadArray == null ) {
+          throw new \UnexpectedValueException( 'unexpected payload' );
         }
       }
     }
@@ -50,7 +52,7 @@ class JWT
       'iss'   => $issuer,
       'aud'   => $audience,
       'exp'   => $expiration,
-      'iat'   => time(),
+      'iat'   => $this->getCurrentTime(),
       'nonce' => $nonce
     );
     $header  = base64_encode( json_encode( $headerArray ) );
@@ -94,7 +96,7 @@ class JWT
     return $this->payloadArray;
   }
 
-  public function verify( $issuer, $audience, $nonce, $secret )
+  public function verify( $issuer, $audience, $nonce, $secret, $iatLimit = 600 )
   {
     /**
      * check header
@@ -121,12 +123,12 @@ class JWT
     }
 
     // exp
-    if ( $this->payloadArray['exp'] < time() ) {
+    if ( $this->payloadArray['exp'] < $this->getCurrentTime() ) {
       throw new \Exception( 'expired id token' );
     }
 
     // iat
-    if ( time() - $this->payloadArray['iat'] > 600 ) {
+    if ( $this->getCurrentTime() - $this->payloadArray['iat'] > $iatLimit ) {
       throw new \Exception( 'expired iat' );
     }
 
@@ -167,5 +169,10 @@ class JWT
     str_replace( array( '+', '/' ), array( '-', '_' ), $encodedHash ) );
 
     return $signature;
+  }
+
+  public function getCurrentTime()
+  {
+    return time();
   }
 }
