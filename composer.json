@@ -1,0 +1,22 @@
+{
+    "name": "kura-lab/jose-php",
+    "description": "Json Web Token (JWT) Library",
+    "keywords": ["JWT", "JSON Web Token", "JOSE"],
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/kura-lab/jose-php",
+    "authors": [
+      {
+        "name": "kura-lab",
+        "email": "none"
+      }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+      "psr-0": {
+        "kuralab\\jose": "src/"
+      }
+    }
+}
