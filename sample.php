@@ -1,7 +1,8 @@
 <?php
-require_once('../src/JsonWebToken.php');
 
-use \kuralab\jose\JsonWebToken as JWT;
+require_once("vendor/autoload.php");
+
+use kuralab\jose\JsonWebToken as JWT;
 
 // initialize parameters
 $algorithm  = 'HS256';
