@@ -1,7 +1,8 @@
 <?php
-require_once('../src/JsonWebToken.php');
 
-use \kuralab\jose\JsonWebToken as JWT;
+require_once('../src/kuralab/jose/JsonWebToken.php');
+
+use kuralab\jose\JsonWebToken as JWT;
 
 class JsonWebTokenTest extends PHPUnit_Framework_TestCase
 {
