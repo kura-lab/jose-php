@@ -30,11 +30,11 @@ class JsonWebToken
         $this->header    = $explodedIdToken[0];
         $this->payload   = $explodedIdToken[1];
         $this->signature = $explodedIdToken[2];
-        $this->headerArray  = json_decode( base64_decode( $this->header ), true );
+        $this->headerArray  = json_decode( $this->decodeUrlSafe( $this->header ), true );
         if ( $this->headerArray == null ) {
           throw new \UnexpectedValueException( 'unexpected header' );
         }
-        $this->payloadArray = json_decode( base64_decode( $this->payload ), true );
+        $this->payloadArray = json_decode( $this->decodeUrlSafe( $this->payload ), true );
         if( $this->payloadArray == null ) {
           throw new \UnexpectedValueException( 'unexpected payload' );
         }
@@ -58,8 +58,8 @@ class JsonWebToken
       'iat'   => $this->getCurrentTime(),
       'nonce' => $nonce
     );
-    $header  = base64_encode( json_encode( $headerArray ) );
-    $payload = base64_encode( json_encode( $payloadArray ) );
+    $header  = $this->encodeUrlSafe( json_encode( $headerArray ) );
+    $payload = $this->encodeUrlSafe( json_encode( $payloadArray ) );
     $signature = $this->generateSignature(
       $header,
       $payload,
@@ -154,15 +154,10 @@ class JsonWebToken
         throw new \Exception( 'signature error' );
       }
     } else if ( preg_match( '/^RS/', $this->headerArray['alg'] ) ) {
-      $signature = str_replace(
-        array( '-', '_' ),
-        array( '+', '/' ),
-        $this->signature
-      );
       $publicKey = openssl_pkey_get_public( $secret );
       $result = openssl_verify(
         $this->header . '.' . $this->payload,
-        base64_decode( $signature ),
+        $this->decodeUrlSafe( $signature ),
         $publicKey,
         self::$supportedAlgorithm[$this->headerArray['alg']]
       );
@@ -198,11 +193,7 @@ class JsonWebToken
       throw new \Exception( 'unsupported algorithm' );
     }
 
-    $encodedHash = base64_encode( $signature );
-    $signature = str_replace( array( '=' ), array( '' ), 
-    str_replace( array( '+', '/' ), array( '-', '_' ), $encodedHash ) );
-    
-    return $signature;
+    return $this->encodeUrlSafe( $signature );
   }
 
   private function encryptRsa( $algorithm, $data, $secret )
@@ -217,5 +208,25 @@ class JsonWebToken
   public function getCurrentTime()
   {
     return time();
+  }
+
+  public function encodeUrlSafe( $data )
+  {
+    $data = base64_encode( $data );
+    $data = str_replace( array( '=' ), array( '' ), 
+    str_replace( array( '+', '/' ), array( '-', '_' ), $data ) );
+    return $data;
+  }
+
+  public function decodeUrlSafe( $data )
+  {
+    $data = str_replace( array('-', '_'), array('+', '/'), $data );
+
+    $lack = strlen( $data ) % 4;
+    if ( $lack > 0 ) {
+      $padding = 4 - $lack;
+      $data .= str_repeat( '=', $padding );
+    }
+    return base64_decode( $data );
   }
 }
