@@ -7,12 +7,13 @@
     "homepage": "https://github.com/kura-lab/jose-php",
     "authors": [
       {
-        "name": "kura-lab",
-        "email": "none"
+        "name": "kura-lab"
       }
     ],
     "require-dev": {
-        "phpunit/phpunit": "3.7.*"
+        "squizlabs/php_codesniffer": "2.*",
+        "phpunit/phpunit": "4.6.*",
+        "fabpot/php-cs-fixer": "1.7.*"
     },
     "autoload": {
       "psr-0": {
