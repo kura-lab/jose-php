@@ -99,7 +99,7 @@ class JsonWebToken
     return $this->payloadArray;
   }
 
-  public function verify( $issuer, $audience, $nonce, $secret, $iatLimit = 600 )
+  public function verify( $issuer, $audience, $nonce, $secret, $permitedAlgorithm = array(), $iatLimit = 600 )
   {
     /**
      * check header
@@ -110,6 +110,10 @@ class JsonWebToken
 
     if ( $this->headerArray['alg'] == null ) {
       throw new \Exception( 'algorithm is null' );
+    }
+
+    if (!in_array($this->headerArray['alg'], $permitedAlgorithm)) {
+        throw new \Exception('alg type is not permit');
     }
 
     /**

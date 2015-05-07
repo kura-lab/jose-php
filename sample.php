@@ -34,7 +34,8 @@ try {
     $audience,
     $clientId,
     $nonce,
-    $secret
+    $secret,
+    array('HS256')
   );
   $decodedJwt = $jwtObj->decode();
   echo "=== Decoded Json Web Token ===\n";
