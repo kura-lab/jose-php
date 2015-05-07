@@ -6,12 +6,12 @@ class JsonWebTokenTest extends PHPUnit_Framework_TestCase
 {
   public function testExecute()
   {
-    $client_id = 'client123';
-    $secret    = 'xxxyyyzzz';
-    $nonce     = 'aaabbbccc';
+      $client_id = 'client123';
+      $secret    = 'xxxyyyzzz';
+      $nonce     = 'aaabbbccc';
 
-    $jwt1 = new JWT();
-    $encodeJwt = $jwt1->encode(
+      $jwt1 = new JWT();
+      $encodeJwt = $jwt1->encode(
       'HS256',
       'https://example.com',
       $client_id,
@@ -20,13 +20,13 @@ class JsonWebTokenTest extends PHPUnit_Framework_TestCase
       $secret
     );
 
-    $jwt2 = new JWT( $encodeJwt );
-    $decodedJwt = $jwt2->decode();
-    $this->assertEquals( 'JWT', $decodedJwt['header']['typ'] );
-    $this->assertEquals( 'HS256', $decodedJwt['header']['alg'] );
-    $this->assertEquals( 'https://example.com', $decodedJwt['payload']['iss'] );
-    $this->assertEquals( 1390318758, $decodedJwt['payload']['exp'] );
-    $this->assertEquals( $nonce, $decodedJwt['payload']['nonce'] );
+      $jwt2 = new JWT($encodeJwt);
+      $decodedJwt = $jwt2->decode();
+      $this->assertEquals('JWT', $decodedJwt['header']['typ']);
+      $this->assertEquals('HS256', $decodedJwt['header']['alg']);
+      $this->assertEquals('https://example.com', $decodedJwt['payload']['iss']);
+      $this->assertEquals(1390318758, $decodedJwt['payload']['exp']);
+      $this->assertEquals($nonce, $decodedJwt['payload']['nonce']);
   }
 
   /**
@@ -35,20 +35,20 @@ class JsonWebTokenTest extends PHPUnit_Framework_TestCase
    */
   public function testVerifyIat()
   {
-    $client_id   = 'client123';
-    $secret      = 'xxxyyyzzz';
-    $nonce       = 'aaabbbccc';
-    $currentTime = 1391247000;
+      $client_id   = 'client123';
+      $secret      = 'xxxyyyzzz';
+      $nonce       = 'aaabbbccc';
+      $currentTime = 1391247000;
 
-    $stub = $this->getMock(
+      $stub = $this->getMock(
       '\kuralab\jose\JsonWebToken',
       array( 'getCurrentTime' )
     );
-    $stub->expects( $this->any() )
-      ->method( 'getCurrentTime' )
-      ->will( $this->returnValue( $currentTime ) );
+      $stub->expects($this->any())
+      ->method('getCurrentTime')
+      ->will($this->returnValue($currentTime));
 
-    $encodeJwt = $stub->encode(
+      $encodeJwt = $stub->encode(
       'HS256',
       'https://example.com',
       $client_id,
@@ -57,16 +57,16 @@ class JsonWebTokenTest extends PHPUnit_Framework_TestCase
       $secret
     );
 
-    $stub2 = $this->getMock(
+      $stub2 = $this->getMock(
       '\kuralab\jose\JsonWebToken',
       array( 'getCurrentTime' ),
       array( $encodeJwt )
     );
-    $stub2->expects( $this->any() )
-      ->method( 'getCurrentTime' )
-      ->will( $this->returnValue( $currentTime + 601 ) );
+      $stub2->expects($this->any())
+      ->method('getCurrentTime')
+      ->will($this->returnValue($currentTime + 601));
 
-    $stub2->verify(
+      $stub2->verify(
       'https://example.com',
       $client_id,
       $nonce,
