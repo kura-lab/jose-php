@@ -23,24 +23,23 @@ $encodedJwt = $jwtObj->encode(
   $secret
 );
 echo "=== Encoded Json Web Token ===\n";
-print_r( $encodedJwt );
+print_r($encodedJwt);
 echo "\n\n";
 
 try {
 
   // verify and decode jwt
-  $jwtObj = new JWT( $encodedJwt );
-  $jwtObj->verify(
+  $jwtObj = new JWT($encodedJwt);
+    $jwtObj->verify(
     $audience,
     $clientId,
     $nonce,
     $secret,
     array('HS256')
   );
-  $decodedJwt = $jwtObj->decode();
-  echo "=== Decoded Json Web Token ===\n";
-  print_r( $decodedJwt );
-
-} catch ( Exception $e ) {
-  var_dump( $e );
+    $decodedJwt = $jwtObj->decode();
+    echo "=== Decoded Json Web Token ===\n";
+    print_r($decodedJwt);
+} catch (Exception $e) {
+    var_dump($e);
 }
