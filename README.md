@@ -9,7 +9,7 @@ Json Web Token (JWT) Library for PHP
 
 ### Requirements
 
-* PHP 5.3.0 or higher.
+* PHP 5.3.3 or higher.
 
 ### Install
 
@@ -25,14 +25,8 @@ Create composer.json.
 
 ```
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kura-lab/jose-php"
-        }
-    ],
     "require": {
-        "kura-lab/jose-php": "dev-master"
+        "kura-lab/jose-php": "1.*"
     }
 }
 ```
