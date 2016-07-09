@@ -7,9 +7,13 @@
     "homepage": "https://github.com/kura-lab/jose-php",
     "authors": [
       {
-        "name": "kura-lab"
+        "name": "kura",
+        "email": "mkurahay@gmail.com"
       }
     ],
+    "require": {
+        "php": ">=5.3.3"
+    },
     "require-dev": {
         "squizlabs/php_codesniffer": "2.*",
         "phpunit/phpunit": "4.6.*",
