@@ -3,12 +3,15 @@ jose-php
 
 Json Web Token (JWT) Library for PHP
 
+[![Packagist](https://img.shields.io/packagist/v/kura-lab/jose-php.svg)](https://packagist.org/packages/kura-lab/jose-php)
+
 ### Specification
 
 * http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html
 
 ### Requirements
 
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.3.3-8892BF.svg?style=flat-square)](https://php.net/)
 * PHP 5.3.3 or higher.
 
 ### Install
