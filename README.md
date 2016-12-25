@@ -4,6 +4,7 @@ jose-php
 Json Web Token (JWT) Library for PHP
 
 [![Packagist](https://img.shields.io/packagist/v/kura-lab/jose-php.svg)](https://packagist.org/packages/kura-lab/jose-php)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/kura-lab/jose-php/blob/master/LICENSE)
 
 ### Specification
 
