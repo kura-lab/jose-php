@@ -1,6 +1,8 @@
 <?php
 namespace kuralab\jose;
 
+use kuralab\base64url\Base64url;
+
 /**
  * Json Web Token Class
  */
@@ -30,11 +32,11 @@ class JsonWebToken
                 $this->header    = $explodedIdToken[0];
                 $this->payload   = $explodedIdToken[1];
                 $this->signature = $explodedIdToken[2];
-                $this->headerArray  = json_decode($this->decodeUrlSafe($this->header), true);
+                $this->headerArray  = json_decode(Base64url::decode($this->header), true);
                 if ($this->headerArray == null) {
                     throw new \UnexpectedValueException('unexpected header');
                 }
-                $this->payloadArray = json_decode($this->decodeUrlSafe($this->payload), true);
+                $this->payloadArray = json_decode(Base64url::decode($this->payload), true);
                 if ($this->payloadArray == null) {
                     throw new \UnexpectedValueException('unexpected payload');
                 }
@@ -58,8 +60,8 @@ class JsonWebToken
             'iat'   => $this->getCurrentTime(),
             'nonce' => $nonce
         );
-        $header  = $this->encodeUrlSafe(json_encode($headerArray));
-        $payload = $this->encodeUrlSafe(json_encode($payloadArray));
+        $header  = Base64url::encode(json_encode($headerArray));
+        $payload = Base64url::encode(json_encode($payloadArray));
         $signature = $this->generateSignature(
             $header,
             $payload,
@@ -161,7 +163,7 @@ class JsonWebToken
             $publicKey = openssl_pkey_get_public($secret);
             $result = openssl_verify(
                 $this->header . '.' . $this->payload,
-                $this->decodeUrlSafe($signature),
+                Base64url::decode($signature),
                 $publicKey,
                 self::$supportedAlgorithm[$this->headerArray['alg']]
             );
@@ -197,7 +199,7 @@ class JsonWebToken
             throw new \Exception('unsupported algorithm');
         }
 
-        return $this->encodeUrlSafe($signature);
+        return Base64url::encode($signature);
     }
 
     private function encryptRsa($algorithm, $data, $secret)
@@ -212,28 +214,5 @@ class JsonWebToken
     public function getCurrentTime()
     {
         return time();
-    }
-
-    public function encodeUrlSafe($data)
-    {
-        $data = base64_encode($data);
-        $data = str_replace(
-            array( '=' ),
-            array( '' ),
-            str_replace(array( '+', '/' ), array( '-', '_' ), $data)
-        );
-        return $data;
-    }
-
-    public function decodeUrlSafe($data)
-    {
-        $data = str_replace(array('-', '_'), array('+', '/'), $data);
-
-        $lack = strlen($data) % 4;
-        if ($lack > 0) {
-            $padding = 4 - $lack;
-            $data .= str_repeat('=', $padding);
-        }
-        return base64_decode($data);
     }
 }
