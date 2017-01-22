@@ -12,7 +12,8 @@
       }
     ],
     "require": {
-        "php": ">=5.3.3"
+        "php": ">=5.3.3",
+        "kura-lab/base64url": "1.*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "2.*",
